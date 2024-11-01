@@ -19,23 +19,33 @@
         <h2><u>Posts:</u></h2>
       </div>
     </div>
-    <div class="container">
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item">A post of some kind.</li>
-        <li class="list-group-item">Some kind of post.</li>
-      </ul>
+    <div class="container" id="post-list">
+      <ul class="list-group list-group-flush" id="post-section"></ul>
     </div>
     <div class="container">
       <div class="input-group input-group-lg mb-3">
-        <input type="text" class="form-control" placeholder="Post Text" />
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Post Text"
+          id="post-input"
+        />
       </div>
     </div>
     <div class="container">
       <div class="input-group input-group-lg">
-        <input type="text" class="form-control" placeholder="Your Name" />
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Your Name"
+          id="name-input"
+        />
       </div>
       <br />
-      <button type="button" class="btn btn-primary">Submit Post</button>
+      <button type="button" class="btn btn-primary" id="post-btn">
+        Submit Post
+      </button>
     </div>
+    <script src="main.js"></script>
   </body>
 </html>
