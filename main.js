@@ -1,114 +1,130 @@
-const data = []
-const postBtn = document.getElementById('post-btn')
-const postSection = document.getElementById('post-section')
-const postNameInput = document.getElementById('name-input')
-const postInput = document.getElementById('post-input')
-const removeBtn = document.getElementsByClassName('remove')[0]
-const commentsBtn = document.getElementsByClassName('comments')[0]
+const posts = []
 const postList = document.getElementById('post-list')
+const postDiv = document.createElement('div')
+postDiv.className = 'list-group list-group-flush'
+const commTextInput = document.createElement('input')
+const commNameInput = document.createElement('input')
+const commPostBtn = document.createElement('button')
+const commentSection = document.createElement('div')
+const comments = document.createElement('h5')
+comments.classList.add('d-none') // Hides comments until rendered //
+const postBtn = document.getElementById('post-btn')
+
+
+function makePost() {
+  const postInput = document.getElementById('post-input')
+  const posterName = document.getElementById('name-input')
+  const postId = Math.random(Math.floor * 1000)
+  console.log(postId)
+  const post = {
+    id: postId,
+    postText: postInput.value,
+    posterName: posterName.value,
+    comments: []
+  }
+  posts.push(post)
+  postList.innerHTML = ''
+  posts.forEach((post) => {
+    // Creates post elements and renders post/content //
+    const postContent = document.createElement('h5')
+    postList.appendChild(postDiv)
+    postDiv.appendChild(postContent)
+    postContent.innerHTML = `
+      <button class='btn btn-info btn-md remove' type='button' id='${postId}'>Remove</button> 
+      <button class='btn btn-info btn-md comment' type='button' id='${postId}'>Comment</button> 
+      ${post.postText} - Posted By: ${post.posterName}`
+      postInput.value = ''
+      posterName.value = ''
+    // Comments //
+    commTextInput.className = 'input-group input-group-md mb-3 form-control d-none'
+    commTextInput.id = 'comm-text-input'
+    commTextInput.placeholder = 'Comment Text'
+    commNameInput.className = 'input-group input-group-md mb-3 form-control d-none'
+    commNameInput.id = 'comm-name-input'
+    commNameInput.placeholder = 'Your Name'
+    commPostBtn.className = 'btn btn-primary post-comm d-none'
+    commPostBtn.type = 'button'
+    commPostBtn.innerText = 'Post Comment'
+    commPostBtn.id = postId
+    post.comments.forEach((comment) => {
+      postDiv.appendChild(commentSection)
+      commentSection.appendChild(comments)
+      comments.innerHTML = `
+        <button type='button' class='btn btn-info btn-sm remove' id='${comment.commentId}'>Remove</button>
+         ${comment.commentText} - Posted By: ${comment.commenterName}`
+      
+    })
+    // Add comment inputs //
+    postDiv.appendChild(commTextInput)
+    postDiv.appendChild(commNameInput)
+    postDiv.appendChild(commPostBtn)
+  })
+}
+
+function commentsRenderToggle() {
+  console.log(comments.classList)
+  console.log(comments.classList.contains('d-none'))
+  if (comments.classList.contains('d-none')) {
+    console.log('it was hidden')
+    comments.classList.remove('d-none')
+    commTextInput.classList.remove('d-none')
+    commNameInput.classList.remove('d-none')
+    commPostBtn.classList.remove('d-none')
+  } else {
+    console.log('it was not hidden')
+    comments.classList.add('d-none')
+    commTextInput.classList.add('d-none')
+    commNameInput.classList.add('d-none')
+    commPostBtn.classList.add('d-none')
+  }
+}
+
+function postComment(e) {
+  const commId = Math.random()
+  const commTextInput = document.getElementById('comm-text-input')
+  const commNameInput = document.getElementById('comm-name-input')
+  const commentData = {
+    commentId: commId,
+    commentText: commTextInput.value,
+    commenterName: commNameInput.value
+  }
+  const postIndex = posts.findIndex(post => post.id === JSON.parse(e.target.id))
+  posts[postIndex].comments.push(commentData)
+  
+  // Pushes comment to post with correct id //
+  // Renders comment to comment section above comment inputs (findIndex) //
+}
+
+postBtn.addEventListener('click', function() {
+  makePost()
+})
 
 postList.addEventListener('click', function(e) {
-  if (e.target.classList.contains('remove')) {
-    const targetId = JSON.parse(e.target.id)
-    const indexToRem = data.findIndex(post => post.remId === targetId)
-    data.shift(indexToRem)
-    e.target.closest('.list-group-item').remove()
-  } else if (e.target.classList.contains('comments')) {
-
-    // Add and if else that checks if the elements already exist
-    commentsInputFields(e)
-    // renderComments()
-    
-  } else if (e.target.classList.contains('btn-primary')) {
-    const commentData = {
-      name: commentsNameInput.value,
-      comment: commentsInput.value
-    }
-
-    // Find a way to link the button to the id and thus the index and push it in to the comments array //
-    
-    const postId = e.target.closest('.comments')
-    console.log(postId)
+  if (e.target.classList.contains('post-comm')) {
+    postComment(e)
+  } else if (e.target.classList.contains('comment')) {
+    commentsRenderToggle()
   }
 })
 
-const div1 = document.createElement('div')
-const div2 = document.createElement('div')
-const inputDiv1 = document.createElement('div')
-const inputDiv2 = document.createElement('div')
-const commentsInput = document.createElement('input')
-const commentsNameInput = document.createElement('input')
 
-function commentsInputFields(e) {
-  const addCommentBtn = document.createElement('button')
-  addCommentBtn.type = 'button'
-  addCommentBtn.className = 'btn btn-primary'
-  addCommentBtn.innerText = 'Post Comment'
-  const nearestDiv = e.target.closest('div')
-  div1.className = 'container'
-
-  div2.className = 'container'
-
-  inputDiv1.className = 'input-group input-group-lg mb-3'
-
-  inputDiv2.className = "input-group input-group-lg mb-3"
-
-  commentsInput.type = 'text'
-  commentsInput.className = 'form-control'
-  commentsInput.placeholder = 'Comment Text'
-  
-  commentsNameInput.type = 'text'
-  commentsNameInput.className = 'form-control'
-  commentsNameInput.placeholder = 'Your Name'
-  
-  nearestDiv.append(div1)
-  nearestDiv.append(div2)
-  nearestDiv.append(addCommentBtn)
-  div1.append(inputDiv1)
-  div2.append(inputDiv2)
-  inputDiv1.append(commentsInput)
-  inputDiv2.append(commentsNameInput)
+function renderNewComm() {
+  // appends a newly added comment to the correct postId //
 }
 
-function renderComments(e) {
-
-  const post = e.target.closest('h5')
-  const commentSection = document.createElement('div')
-  commentSection.className = 'list-group-item'
-  post.append(commentSection)
-}
-
-function renderPosts() {
-  if (!postNameInput.value || !postInput.value || postNameInput.value === " " || postInput.value === " ") {
-    alert('Both fields must be filled out to post.')
-  }else {
-    const randomComId = Math.random()
-    const randomRemId = Math.floor(Math.random() * 500)
-    const post = {
-      remId: randomRemId,
-      id: randomComId,
-      posterName: postNameInput.value,
-      postText: postInput.value,
-      comments: []
-    }
-    data.push(post)
-    postSection.innerHTML = ""
-    data.forEach((post) => {
-      postSection.innerHTML += `<div class="list-group-item"><h5><button id="${randomRemId}" type="button" class="btn btn-info btn-md remove">Remove</button> <button type="button" id="${randomComId}" class="btn btn-info btn-md comments" >Comments</button> ${post.postText} -Posted By: ${post.posterName} </h5></div>`
-    })
-    postNameInput.value = ""
-    postInput.value = ""
-  }
-}
-
-// Handles posting //
-postBtn.addEventListener('click', function () {
-  renderPosts()
-})
 
 
-// `<div class="input-group input-group-lg mb-3"><input type="text" class="form-control" placeholer="Comment Text"/></div>`
-
-// let div = document.createElement("div");
-// let p = document.createElement("p");
-// div.append(p);
+// const posts = [
+//   {id: 1,
+//    postText: 'sample post 1',
+//    posterName: 'jojo',
+//    comments: []},
+//   {id: 2,
+//    postText: 'sample post 2',
+//    posterName: 'jiji',
+//    comments: []},
+//   {id: 3,
+//    postText: 'sample post 3',
+//    posterName: 'dodo',
+//    comments: []}
+// ]
