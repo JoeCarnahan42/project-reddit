@@ -1,122 +1,120 @@
 const posts = []
-const postList = document.getElementById('post-list')
-const postDiv = document.createElement('div')
-postDiv.className = 'list-group list-group-flush'
-const commTextInput = document.createElement('input')
-const commNameInput = document.createElement('input')
-const commPostBtn = document.createElement('button')
-const commentSection = document.createElement('div')
-const comments = document.createElement('h5')
-comments.classList.add('d-none') // Hides comments until rendered //
-const postBtn = document.getElementById('post-btn')
-const postContent = document.createElement('h5')
-const lineBreak = document.createElement('br')
-
+const postList = document.getElementById('post-list');
+const postBtn = document.getElementById('post-btn');
+const lineBreak = document.createElement('br');
 
 function makePost() {
-  const postInput = document.getElementById('post-input')
-  const posterName = document.getElementById('name-input')
-  const postId = Math.random(Math.floor * 1000)
-  const postData = `
-    <button class='btn btn-info btn-md remove' type='button' id='${postId}'>Remove</button> 
-    <button class='btn btn-info btn-md comment' type='button' id='${postId}'>Comment</button> 
-    ${postInput.value} - Posted By: ${posterName.value}`
-  const post = {
-    id: postId,
-    postText: postData,
-    comments: []
-  }
-  posts.push(post)
-  postContent.innerHTML = ''
-  posts.forEach((post) => {
-    // Creates post elements and renders post/content //
-    postList.appendChild(postDiv)
-    postDiv.appendChild(postContent)
-    postContent.appendChild(lineBreak)
-    postContent.innerHTML += post.postText
-    // Comments Section Construction //
-    commTextInput.className = 'input-group input-group-md mb-3 form-control comm-text-input d-none'
-    commTextInput.id = JSON.stringify(postId)
-    commTextInput.placeholder = 'Comment Text'
-    commNameInput.className = 'input-group input-group-md mb-3 form-control comm-name-input d-none'
-    commNameInput.id = JSON.stringify(postId)
-    commNameInput.placeholder = 'Your Name'
-    commPostBtn.className = 'btn btn-primary post-comm d-none'
-    commPostBtn.type = 'button'
-    commPostBtn.innerText = 'Post Comment'
-    commPostBtn.id = postId
-    // Add comment inputs //
-    postDiv.appendChild(commTextInput)
-    postDiv.appendChild(commNameInput)
-    postDiv.appendChild(commPostBtn)
-  })
-  postInput.value = ''
-  posterName.value = ''
-}
-
-function commentsRenderToggle() {
-  // Link post id and render comments from post //
-  console.log(comments.classList)
-  console.log(comments.classList.contains('d-none'))
-  if (comments.classList.contains('d-none')) {
-    comments.classList.remove('d-none')
-    commTextInput.classList.remove('d-none')
-    commNameInput.classList.remove('d-none')
-    commPostBtn.classList.remove('d-none')
+  const postInput = document.getElementById('post-input');
+  const posterName = document.getElementById('name-input');
+  const postId = Math.random().toString(36).substr(2, 9); 
+  if (postInput.value === "" || posterName.value === '')  {
+    alert('Both input fields must be entered to make a post.')
+    return;
   } else {
-    comments.classList.add('d-none')
-    commTextInput.classList.add('d-none')
-    commNameInput.classList.add('d-none')
-    commPostBtn.classList.add('d-none')
-  }
-}
+    const postDiv = document.createElement('div');
+    postDiv.className = 'list-group-item list-group-flush';
+    postDiv.id = `post-${postId}`;
+    postDiv.innerHTML = `
+      <h5><button class='btn btn-info btn-md remove' id='${postId}'>Remove</button> <button class='btn btn-info btn-md comment' id='${postId}'>View Comments</button> ${postInput.value} - Posted By: ${posterName.value}</h5>
+      <div id="comment-section-${postId}" class="${postId} d-none"></div>
+      <input id="comment-text-${postId}" class="form-control comm-text-input" placeholder="Comment Text" />
+      <br>
+      <input id="comment-name-${postId}" class="form-control comm-name-input" placeholder="Your Name" />
+      <br>
+      <button id='${postId}' class="btn btn-primary post-comm">Post Comment</button>
+    `;
+    postList.appendChild(postDiv);
+    posts.push({
+      id: postId,
+      postText: postInput.value,
+      comments: [],
+    });
+    postInput.value = '';
+    posterName.value = '';
+  };
+};
 
-function postComment(e) {
-  const commId = Math.random()
-  const commTextInput = document.querySelector('.comm-text-input')
-  const commNameInput = document.querySelector('.comm-name-input')
-  const commText = commTextInput.value
-  const commName = commNameInput.value
-  const commData = `
-  <button type='button' class='btn btn-info btn-sm remove' id='${commId}'>Remove</button>
-  ${commText} - Posted By: ${commName}`
-  
-  const commentData = {
-    commentId: commId,
-    commentText: commData,
-  }
-  const postIndex = posts.findIndex(post => post.id === JSON.parse(e.target.id))
-  posts[postIndex].comments.push(commentData)
-  comments.innerHTML = ''
-  posts[postIndex].comments.forEach((comment) => {
-    postContent.appendChild(commentSection)
-    commentSection.appendChild(comments)
-    comments.appendChild(lineBreak)
-    comments.innerHTML += comment.commentText
-  })
-  commTextInput.value = ''
-  commNameInput.value = ''
+function commentsRenderToggle(postId) {
+  const commentSection = document.querySelector(`#comment-section-${postId}`);
+  if (commentSection.classList.contains('d-none')) {
+    commentSection.classList.remove('d-none');
+  } else {
+    commentSection.classList.add('d-none');
+  };
+};
+
+function postComment(postId) {
+  const commId = Math.random().toString(36).substr(2, 9); // Assigns Specific ID to Comments //
+  const commTextInput = document.querySelector(`#comment-text-${postId}`);
+  const commNameInput = document.querySelector(`#comment-name-${postId}`);
+  const commDiv = document.createElement('div');
+  commDiv.id = commId;
+  commDiv.className = `comment-div ${postId}`;
+  const postIndex = posts.findIndex((post) => post.id === postId);
+  const commentSection = document.querySelector(`#comment-section-${postId}`);
+  // Checks Input Fields //
+  if (commTextInput.value === '' || commNameInput.value === '') {
+    alert('Both input fields must be entered to post a comment.');
+    return;
+  } else {
+    const commData = `
+    <h6><button type='button' class='btn btn-info btn-sm remove-comm' id='${commId}'>Remove</button>
+    ${commTextInput.value} - Posted By: ${commNameInput.value}</h6>`;
+    commentSection.innerHTML = ''
+    commentSection.appendChild(commDiv);
+    posts[postIndex].comments.push({
+      commentId: commId,
+      commentText: commData
+    });
+    posts[postIndex].comments.forEach(comment => {
+      commDiv.innerHTML += comment.commentText;
+    });
+    commTextInput.value = '';
+    commNameInput.value = '';
+  };
+  // Renders Comments Section to View New Comments IF Comments Are Hidden //
+  if (commentSection.classList.contains('d-none')) {
+    commentsRenderToggle(postId);
+  } else {
+    return;
+  };
 }
 
 postBtn.addEventListener('click', function() {
-  makePost()
-})
+  makePost();
+});
 
 postList.addEventListener('click', function(e) {
   if (e.target.classList.contains('post-comm')) {
-    postComment(e)
+    const postId = e.target.id;
+    postComment(postId);
   } else if (e.target.classList.contains('comment')) {
-    commentsRenderToggle()
-  }
-})
+    const postId = e.target.id;
+    commentsRenderToggle(postId);
+  } else if (e.target.classList.contains('remove')) {
+    const postId = e.target.id;
+    removePost(postId, e);
+  } else if (e.target.classList.contains('remove-comm')) {
+    const commId = e.target.id;
+    const commDiv = e.target.closest('div');
+    removeComment(commId, e, commDiv);
+  };
+});
 
-// !!Problems!! //
-// 1. Once a new post is made, the comments are unrendered, but still exist in the array.
-// 2. Clicking the comments button does not render the ONLY the comments under that particular post.
-// 3. Once a comment is posted, it will render under any post that the comments button is clicked.
-// 4. Probably more that i have no found yet...
+function removePost(postId, e) {
+  const post = posts.findIndex(post => post.id === postId);
+  const nearestPost = e.target.closest(`#post-${postId}`);
+  posts.splice(post, 1);
+  nearestPost.remove();
+};
 
-// !! TODO !! //
-// 1. Code remove buttons on posts(easy)
-// 2. Code remove buttons on comments(probably easy)
-// 3. Fix errors...
+function removeComment(commId, e, commDiv) {
+  const postId = commDiv.classList[1];
+  const nearestComm = e.target.closest(`h6`);
+  const postIndex = posts.findIndex(post => post.id === postId)
+  const commentIndex = posts[postIndex].comments.findIndex(comment => comment.commentId === commId);
+  if (commentIndex !== -1) {
+    posts[postIndex].comments.splice(commentIndex, 1);
+    nearestComm.remove();
+  };
+};
